@@ -82,6 +82,9 @@
 static void out_peer_id (struct tgl_state *TLS, tgl_peer_id_t id);
 static struct query_methods send_msgs_methods;
 
+// struct global_reg_state *GBRS =  NULL;
+int global_registration_status = 2;
+
 struct messages_send_extra {
   int multi;
   int count;
@@ -1576,17 +1579,17 @@ void tgl_do_get_local_history (struct tgl_state *TLS, tgl_peer_id_t id, int offs
 
 static void _tgl_do_get_history (struct tgl_state *TLS, struct get_history_extra *E, void (*callback)(struct tgl_state *TLS,void *callback_extra, int success, int size, struct tgl_message *list[]), void *callback_extra) {
   clear_packet ();
-  tgl_peer_t *C = tgl_peer_get (TLS, E->id);
-  if (tgl_get_peer_type (E->id) != TGL_PEER_CHANNEL || (C && (C->flags & TGLCHF_MEGAGROUP))) {
+  //tgl_peer_t *C = tgl_peer_get (TLS, E->id);
+  //if (tgl_get_peer_type (E->id) != TGL_PEER_CHANNEL || (C && (C->flags & TGLCHF_MEGAGROUP))) {
     out_int (CODE_messages_get_history);
     out_peer_id (TLS, E->id);
-  } else {    
-    out_int (CODE_channels_get_important_history);
-    
-    out_int (CODE_input_channel);
-    out_int (tgl_get_peer_id (E->id));
-    out_long (E->id.access_hash);
-  }
+  //} else {    
+  //  out_int (CODE_channels_get_important_history);
+  //  
+  //  out_int (CODE_input_channel);
+  //  out_int (tgl_get_peer_id (E->id));
+  //  out_long (E->id.access_hash);
+  //}
   out_int (E->max_id);
   out_int (E->offset);
   out_int (E->limit);
@@ -5156,8 +5159,10 @@ void tgl_sign_in_result (struct tgl_state *TLS, void *_T, int success, struct tg
     tfree (E->phone, E->phone_len);
     tfree (E->hash, E->hash_len);
     tfree (E, sizeof (*E));
+      global_registration_status = REG_COMPLETE;
   } else {
     vlogprintf (E_ERROR, "incorrect code\n");
+      global_registration_status = REG_ERR_INVALID_CODE;
     TLS->callback.get_values (TLS, tgl_code, "code ('call' for phone call):", 1, tgl_sign_in_code, E);
     return;
   }
@@ -5247,18 +5252,23 @@ void tgl_sign_in_phone (struct tgl_state *TLS, const char *phone[], void *arg);
 void tgl_sign_in_phone_cb (struct tgl_state *TLS, void *extra, int success, int registered, const char *mhash) {
   struct sign_up_extra *E = extra;
   if (!success) {
-    vlogprintf (E_ERROR, "Incorrect phone number\n");
+      global_registration_status = REG_ERR_INVALID_PHONE;
 
+    vlogprintf (E_ERROR, "Incorrect phone number\n");
     tfree (E->phone, E->phone_len);
     tfree (E, sizeof (*E));
-    TLS->callback.get_values (TLS, tgl_phone_number, "phone number:", 1, tgl_sign_in_phone, NULL);
+    TLS->callback.get_values (TLS, tgl_phone_number, "phone number2:", 1, tgl_sign_in_phone, NULL);
     return;
   }
 
   E->hash_len = strlen (mhash);
   E->hash = tmemdup (mhash, E->hash_len);
 
+    global_registration_values->hash_len = E->hash_len;
+    global_registration_values->hash = tmemdup (mhash, global_registration_values->hash_len);
+
   if (registered) {
+      global_registration_status = REG_WAITING_FOR_CODE;
     TLS->callback.get_values (TLS, tgl_code, "code ('call' for phone call):", 1, tgl_sign_in_code, E);
   } else {
     TLS->callback.get_values (TLS, tgl_register_info, "registration info:", 3, tgl_register_cb, E);
@@ -5266,11 +5276,15 @@ void tgl_sign_in_phone_cb (struct tgl_state *TLS, void *extra, int success, int 
 }
 
 void tgl_sign_in_phone (struct tgl_state *TLS, const char *phone[], void *arg) {
-  struct sign_up_extra *E = talloc0 (sizeof (*E));
-  E->phone_len = strlen (phone[0]);
-  E->phone = tmemdup (phone[0], E->phone_len);
+    struct sign_up_extra *E = talloc0 (sizeof (*E));
+    E->phone_len = strlen (phone[0]);
+    E->phone = tmemdup (phone[0], E->phone_len);
 
-  tgl_do_send_code (TLS, E->phone, E->phone_len, tgl_sign_in_phone_cb, E);
+    global_registration_values = talloc0 (sizeof (*E));
+    global_registration_values->phone_len = E->phone_len;
+    global_registration_values->phone = tmemdup (phone[0], global_registration_values->phone_len);
+
+    tgl_do_send_code (TLS, E->phone, E->phone_len, tgl_sign_in_phone_cb, E);
 }
 
 void tgl_bot_hash_cb (struct tgl_state *TLS, const char *code[], void *arg);

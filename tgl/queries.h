@@ -85,3 +85,15 @@ void tglq_regen_queries_from_old_session (struct tgl_state *TLS, struct tgl_dc *
 //int get_dh_config_on_answer (struct query *q);
 //void fetch_dc_option (void);
 #endif
+
+static const int REG_COMPLETE = 0;
+static const int REG_WAITING_FOR_CODE = 1;
+static const int REG_WAITING_FOR_PHONE = 2;
+static const int REG_ERR_INVALID_PHONE = 3;
+static const int REG_ERR_INVALID_CODE = 4;
+int global_registration_status;
+
+struct sign_up_extra *global_registration_values;
+
+void tgl_sign_in_phone(struct tgl_state *TLS, const char *phone[], void *arg);
+void tgl_sign_in_code (struct tgl_state *TLS, const char *code[], void *_T);
