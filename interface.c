@@ -852,7 +852,13 @@ void do_phone_register (struct command *command, int arg_num, struct arg args[],
     phone[0] = args[0].str;
     tgl_sign_in_phone(TLS, phone, 0);
 
-    mprintf (ev, "{'phone': '%s'}}", args[0].str);
+    json_t *res = json_object ();
+    assert (json_object_set (res, "phone", json_string(global_registration_values->phone)) >= 0);
+    char *s = json_dumps (res, 0);
+    mprintf (ev, "%s\n", s);
+    json_decref (res);
+    free (s);
+
 
     if (ev) { mprint_end (ev); }
     if (!ev) {
@@ -872,7 +878,14 @@ void do_send_code (struct command *command, int arg_num, struct arg args[], stru
     code[0] = args[0].str;
     tgl_sign_in_code(TLS, code, global_registration_values);
 
-    mprintf (ev, "{'phone': '%s', 'code':'%s'}}", global_registration_values->phone, args[0].str);
+    json_t *res = json_object ();
+    assert (json_object_set (res, "phone", json_string(global_registration_values->phone)) >= 0);
+    assert (json_object_set (res, "code", json_string(args[0].str)) >= 0);
+    char *s = json_dumps (res, 0);
+    mprintf (ev, "%s\n", s);
+    json_decref (res);
+    free (s);
+
 
     if (ev) { mprint_end (ev); }
     if (!ev) {
@@ -886,7 +899,12 @@ void do_get_registration_status (struct command *command, int arg_num, struct ar
         mprint_start (ev);
     }
 
-    mprintf (ev, "{'status': '%d'}}", global_registration_status);
+    json_t *res = json_object ();
+    assert (json_object_set (res, "status", json_integer(global_registration_status)) >= 0);
+    char *s = json_dumps (res, 0);
+    mprintf (ev, "%s\n", s);
+    json_decref (res);
+    free (s);
 
     if (ev) { mprint_end (ev); }
     if (!ev) {

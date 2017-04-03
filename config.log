@@ -699,8 +699,8 @@ configure:5921: gcc -o conftest -g -O2  -I/usr/local/include -I/usr/include -I/u
 conftest.c:34:6: warning: conflicting types for built-in function 'exp'
  char exp ();
       ^
-/tmp/ccZ6Vxbo.o: In function `main':
-/home/paolo/CLionProjects/telegram-cli/conftest.c:38: undefined reference to `exp'
+/tmp/ccs1Dtfj.o: In function `main':
+/home/paolo/CLionProjects/tg/conftest.c:38: undefined reference to `exp'
 collect2: error: ld returned 1 exit status
 configure:5921: $? = 1
 configure: failed program was:
@@ -753,8 +753,8 @@ configure:5921: $? = 0
 configure:5938: result: -lm
 configure:5946: checking for library containing dlopen
 configure:5977: gcc -o conftest -g -O2  -I/usr/local/include -I/usr/include -I/usr/include  -L/usr/local/lib -L/usr/lib -L/usr/lib conftest.c -lm -lconfig -lz -levent   >&5
-/tmp/cc5gPADr.o: In function `main':
-/home/paolo/CLionProjects/telegram-cli/conftest.c:38: undefined reference to `dlopen'
+/tmp/ccwCKEio.o: In function `main':
+/home/paolo/CLionProjects/tg/conftest.c:38: undefined reference to `dlopen'
 collect2: error: ld returned 1 exit status
 configure:5977: $? = 1
 configure: failed program was:
@@ -804,8 +804,8 @@ configure:5977: $? = 0
 configure:5994: result: -ldl
 configure:6016: checking for library containing lua_load
 configure:6051: gcc -o conftest -g -O2  -I/usr/local/include -I/usr/include -I/usr/include  -L/usr/local/lib -L/usr/lib -L/usr/lib conftest.c -lconfig -lz -levent   >&5
-/tmp/ccBdrqIx.o: In function `main':
-/home/paolo/CLionProjects/telegram-cli/conftest.c:38: undefined reference to `lua_load'
+/tmp/ccIkczct.o: In function `main':
+/home/paolo/CLionProjects/tg/conftest.c:38: undefined reference to `lua_load'
 collect2: error: ld returned 1 exit status
 configure:6051: $? = 1
 configure: failed program was:
