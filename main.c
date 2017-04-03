@@ -865,7 +865,7 @@ void sig_term_handler(int signum __attribute__ ((unused))) {
 void do_halt(int error) {
     int retval;
     if (daemonize) {
-        return;
+        //return;
     }
 
     if (!readline_disabled) {
